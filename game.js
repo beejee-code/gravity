@@ -334,6 +334,10 @@ class LunarLanderScene extends Phaser.Scene {
             thrust: null
         };
 
+        // Gyroscope rotation control
+        this.gyroscopeEnabled = false;
+        this.gyroscopeRotation = 0;
+
         if (isMobileDevice()) {
             this.createTouchControls();
         }
@@ -430,25 +434,25 @@ class LunarLanderScene extends Phaser.Scene {
         const bottomY = this.height - buttonSize - padding;
 
         // Left button
-        const leftButton = this.add.circle(padding + buttonSize / 2, bottomY, buttonSize / 2, 0x4444ff, 0.7)
+        this.leftButton = this.add.circle(padding + buttonSize / 2, bottomY, buttonSize / 2, 0x4444ff, 0.7)
             .setInteractive()
             .on('pointerdown', (pointer) => { 
                 this.touchPointers.left = pointer.id; 
                 this.touchControls.left = true; 
-                leftButton.setFillStyle(0x6666ff, 0.9); 
+                this.leftButton.setFillStyle(0x6666ff, 0.9); 
             })
             .on('pointerup', (pointer) => { 
                 if (this.touchPointers.left === pointer.id) {
                     this.touchControls.left = false; 
                     this.touchPointers.left = null;
-                    leftButton.setFillStyle(0x4444ff, 0.7); 
+                    this.leftButton.setFillStyle(0x4444ff, 0.7); 
                 }
             })
             .on('pointerout', (pointer) => { 
                 if (this.touchPointers.left === pointer.id) {
                     this.touchControls.left = false; 
                     this.touchPointers.left = null;
-                    leftButton.setFillStyle(0x4444ff, 0.7); 
+                    this.leftButton.setFillStyle(0x4444ff, 0.7); 
                 }
             });
         
@@ -459,25 +463,25 @@ class LunarLanderScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Right button
-        const rightButton = this.add.circle(padding * 2 + buttonSize * 1.5, bottomY, buttonSize / 2, 0x4444ff, 0.7)
+        this.rightButton = this.add.circle(padding * 2 + buttonSize * 1.5, bottomY, buttonSize / 2, 0x4444ff, 0.7)
             .setInteractive()
             .on('pointerdown', (pointer) => { 
                 this.touchPointers.right = pointer.id; 
                 this.touchControls.right = true; 
-                rightButton.setFillStyle(0x6666ff, 0.9); 
+                this.rightButton.setFillStyle(0x6666ff, 0.9); 
             })
             .on('pointerup', (pointer) => { 
                 if (this.touchPointers.right === pointer.id) {
                     this.touchControls.right = false; 
                     this.touchPointers.right = null;
-                    rightButton.setFillStyle(0x4444ff, 0.7); 
+                    this.rightButton.setFillStyle(0x4444ff, 0.7); 
                 }
             })
             .on('pointerout', (pointer) => { 
                 if (this.touchPointers.right === pointer.id) {
                     this.touchControls.right = false; 
                     this.touchPointers.right = null;
-                    rightButton.setFillStyle(0x4444ff, 0.7); 
+                    this.rightButton.setFillStyle(0x4444ff, 0.7); 
                 }
             });
         
@@ -515,6 +519,19 @@ class LunarLanderScene extends Phaser.Scene {
             fontFamily: 'monospace'
         }).setOrigin(0.5);
 
+        // Gyroscope toggle button
+        const gyroButtonY = bottomY - buttonSize - padding;
+        this.gyroButton = this.add.circle(this.width / 2, gyroButtonY, buttonSize / 2, 0x00aa00, 0.7)
+            .setInteractive()
+            .on('pointerdown', () => {
+                this.toggleGyroscope();
+            });
+        
+        this.gyroButtonText = this.add.text(this.width / 2, gyroButtonY, '🔄', {
+            fontSize: '32px',
+            fontFamily: 'monospace'
+        }).setOrigin(0.5);
+
         // Restart button (hidden initially, shown on game over)
         this.restartButton = this.add.circle(this.width / 2, this.height / 2 + 80, buttonSize / 2, 0x00ff00, 0.8)
             .setInteractive()
@@ -534,6 +551,59 @@ class LunarLanderScene extends Phaser.Scene {
             this.restartButton.setVisible(true);
             this.restartButtonText.setVisible(true);
         };
+    }
+
+    toggleGyroscope() {
+        this.gyroscopeEnabled = !this.gyroscopeEnabled;
+        
+        if (this.gyroscopeEnabled) {
+            // Request permission for device orientation (iOS 13+)
+            if (typeof DeviceOrientationEvent !== 'undefined' && 
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', this.handleOrientation.bind(this));
+                            this.gyroButton.setFillStyle(0x00ff00, 0.9);
+                            this.gyroButtonText.setText('📱');
+                            // Hide rotation buttons
+                            this.leftButton.setVisible(false);
+                            this.rightButton.setVisible(false);
+                        } else {
+                            this.gyroscopeEnabled = false;
+                            alert('Permission denied for device orientation');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Non-iOS devices or older iOS
+                window.addEventListener('deviceorientation', this.handleOrientation.bind(this));
+                this.gyroButton.setFillStyle(0x00ff00, 0.9);
+                this.gyroButtonText.setText('📱');
+                // Hide rotation buttons
+                this.leftButton.setVisible(false);
+                this.rightButton.setVisible(false);
+            }
+        } else {
+            window.removeEventListener('deviceorientation', this.handleOrientation.bind(this));
+            this.gyroButton.setFillStyle(0x00aa00, 0.7);
+            this.gyroButtonText.setText('🔄');
+            this.gyroscopeRotation = 0;
+            // Show rotation buttons
+            this.leftButton.setVisible(true);
+            this.rightButton.setVisible(true);
+        }
+    }
+
+    handleOrientation(event) {
+        // Use gamma (left/right tilt) for rotation control
+        // Gamma is the left-to-right tilt in degrees, where right is positive
+        if (event.gamma !== null) {
+            // Clamp gamma to reasonable range (-45 to 45 degrees)
+            const clampedGamma = Math.max(-45, Math.min(45, event.gamma));
+            // Convert to rotation input (-1 to 1)
+            this.gyroscopeRotation = clampedGamma / 45;
+        }
     }
 
     drawLander() {
@@ -654,11 +724,17 @@ class LunarLanderScene extends Phaser.Scene {
         const rightPressed = this.cursors.right.isDown || this.touchControls.right;
         const thrustPressed = this.cursors.up.isDown || this.touchControls.thrust;
 
-        if (leftPressed) {
-            this.lander.angle -= this.ROTATION_SPEED;
-        }
-        if (rightPressed) {
-            this.lander.angle += this.ROTATION_SPEED;
+        if (this.gyroscopeEnabled) {
+            // Use gyroscope for rotation
+            this.lander.angle += this.gyroscopeRotation * this.ROTATION_SPEED;
+        } else {
+            // Use keyboard/touch for rotation
+            if (leftPressed) {
+                this.lander.angle -= this.ROTATION_SPEED;
+            }
+            if (rightPressed) {
+                this.lander.angle += this.ROTATION_SPEED;
+            }
         }
 
         // Thrust
