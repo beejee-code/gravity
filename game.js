@@ -2,6 +2,26 @@
 let selectedRocketType = 'apple';
 let selectedGravity = 0.0033;
 
+// Mobile device detection
+function isMobileDevice() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+           (window.innerWidth <= 800 && window.innerHeight <= 800);
+}
+
+// Get appropriate game dimensions based on device
+function getGameDimensions() {
+    if (isMobileDevice()) {
+        return {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+    }
+    return {
+        width: 800,
+        height: 600
+    };
+}
+
 class RocketSelectionScene extends Phaser.Scene {
     constructor() {
         super({ key: 'RocketSelectionScene' });
@@ -12,8 +32,9 @@ class RocketSelectionScene extends Phaser.Scene {
         this.height = this.scale.height;
 
         // Title
+        const titleFontSize = isMobileDevice() ? '32px' : '48px';
         this.add.text(this.width / 2, 50, 'SELECT YOUR ROCKET', {
-            fontSize: '48px',
+            fontSize: titleFontSize,
             fill: '#ffffff',
             fontFamily: 'monospace'
         }).setOrigin(0.5);
@@ -21,26 +42,32 @@ class RocketSelectionScene extends Phaser.Scene {
         // Create starfield background
         this.createStars();
 
-        // Rocket options
-        const rocketOptions = [
-            { type: 'apple', name: 'Apple Rocket', x: this.width / 2 - 200 },
-            { type: 'emoji', name: 'Emoji Rocket', x: this.width / 2 },
-            { type: 'classic', name: 'Classic Rocket', x: this.width / 2 + 200 }
-        ];
+        // Rocket options - adjust layout for mobile
+        const rocketOptions = isMobileDevice() 
+            ? [
+                { type: 'apple', name: 'Apple Rocket', x: this.width / 2, y: 150 },
+                { type: 'emoji', name: 'Emoji Rocket', x: this.width / 2, y: 300 },
+                { type: 'classic', name: 'Classic Rocket', x: this.width / 2, y: 450 }
+              ]
+            : [
+                { type: 'apple', name: 'Apple Rocket', x: this.width / 2 - 200, y: 200 },
+                { type: 'emoji', name: 'Emoji Rocket', x: this.width / 2, y: 200 },
+                { type: 'classic', name: 'Classic Rocket', x: this.width / 2 + 200, y: 200 }
+              ];
 
         rocketOptions.forEach((option, index) => {
             // Draw preview
-            this.drawRocketPreview(option.x, 200, option.type);
+            this.drawRocketPreview(option.x, option.y, option.type);
 
             // Name label
-            this.add.text(option.x, 280, option.name, {
+            this.add.text(option.x, option.y + 80, option.name, {
                 fontSize: '20px',
                 fill: '#ffffff',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Selection button
-            const button = this.add.rectangle(option.x, 350, 150, 50, 0x4444ff)
+            const button = this.add.rectangle(option.x, option.y + 150, 150, 50, 0x4444ff)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerover', () => button.setFillStyle(0x6666ff))
                 .on('pointerout', () => button.setFillStyle(0x4444ff))
@@ -49,7 +76,7 @@ class RocketSelectionScene extends Phaser.Scene {
                     this.scene.start('GravitySelectionScene');
                 });
 
-            this.add.text(option.x, 350, 'SELECT', {
+            this.add.text(option.x, option.y + 150, 'SELECT', {
                 fontSize: '18px',
                 fill: '#ffffff',
                 fontFamily: 'monospace'
@@ -57,7 +84,8 @@ class RocketSelectionScene extends Phaser.Scene {
         });
 
         // Instructions
-        this.add.text(this.width / 2, 500, 'Click a button to select your rocket', {
+        const instructionsY = isMobileDevice() ? this.height - 50 : 500;
+        this.add.text(this.width / 2, instructionsY, 'Click a button to select your rocket', {
             fontSize: '16px',
             fill: '#aaaaaa',
             fontFamily: 'monospace'
@@ -144,8 +172,9 @@ class GravitySelectionScene extends Phaser.Scene {
         this.height = this.scale.height;
 
         // Title
+        const titleFontSize = isMobileDevice() ? '32px' : '48px';
         this.add.text(this.width / 2, 50, 'SELECT GRAVITY', {
-            fontSize: '48px',
+            fontSize: titleFontSize,
             fill: '#ffffff',
             fontFamily: 'monospace'
         }).setOrigin(0.5);
@@ -153,37 +182,43 @@ class GravitySelectionScene extends Phaser.Scene {
         // Create starfield background
         this.createStars();
 
-        // Gravity options
-        const gravityOptions = [
-            { type: 'moon', name: 'Moon Gravity', value: 0.0033, description: '~1/6 Earth gravity', x: this.width / 2 - 250 },
-            { type: 'earth', name: 'Earth Gravity', value: 0.02, description: 'Standard gravity', x: this.width / 2 },
-            { type: 'asteroid', name: 'Asteroid Gravity', value: 0.0015, description: '~1/20 Earth gravity', x: this.width / 2 + 250 }
-        ];
+        // Gravity options - adjust layout for mobile
+        const gravityOptions = isMobileDevice()
+            ? [
+                { type: 'moon', name: 'Moon Gravity', value: 0.0033, description: '~1/6 Earth gravity', x: this.width / 2, y: 150 },
+                { type: 'earth', name: 'Earth Gravity', value: 0.02, description: 'Standard gravity', x: this.width / 2, y: 300 },
+                { type: 'asteroid', name: 'Asteroid Gravity', value: 0.0015, description: '~1/20 Earth gravity', x: this.width / 2, y: 450 }
+              ]
+            : [
+                { type: 'moon', name: 'Moon Gravity', value: 0.0033, description: '~1/6 Earth gravity', x: this.width / 2 - 250, y: 200 },
+                { type: 'earth', name: 'Earth Gravity', value: 0.02, description: 'Standard gravity', x: this.width / 2, y: 200 },
+                { type: 'asteroid', name: 'Asteroid Gravity', value: 0.0015, description: '~1/20 Earth gravity', x: this.width / 2 + 250, y: 200 }
+              ];
 
         gravityOptions.forEach((option, index) => {
             // Name label
-            this.add.text(option.x, 200, option.name, {
+            this.add.text(option.x, option.y, option.name, {
                 fontSize: '24px',
                 fill: '#ffffff',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Description
-            this.add.text(option.x, 240, option.description, {
+            this.add.text(option.x, option.y + 40, option.description, {
                 fontSize: '16px',
                 fill: '#aaaaaa',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Gravity value
-            this.add.text(option.x, 270, `G: ${option.value}`, {
+            this.add.text(option.x, option.y + 70, `G: ${option.value}`, {
                 fontSize: '14px',
                 fill: '#888888',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Selection button
-            const button = this.add.rectangle(option.x, 350, 150, 50, 0x4444ff)
+            const button = this.add.rectangle(option.x, option.y + 150, 150, 50, 0x4444ff)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerover', () => button.setFillStyle(0x6666ff))
                 .on('pointerout', () => button.setFillStyle(0x4444ff))
@@ -192,7 +227,7 @@ class GravitySelectionScene extends Phaser.Scene {
                     this.scene.start('LunarLanderScene');
                 });
 
-            this.add.text(option.x, 350, 'SELECT', {
+            this.add.text(option.x, option.y + 150, 'SELECT', {
                 fontSize: '18px',
                 fill: '#ffffff',
                 fontFamily: 'monospace'
@@ -200,7 +235,8 @@ class GravitySelectionScene extends Phaser.Scene {
         });
 
         // Instructions
-        this.add.text(this.width / 2, 500, 'Click a button to select gravity', {
+        const instructionsY = isMobileDevice() ? this.height - 50 : 500;
+        this.add.text(this.width / 2, instructionsY, 'Click a button to select gravity', {
             fontSize: '16px',
             fill: '#aaaaaa',
             fontFamily: 'monospace'
@@ -274,6 +310,17 @@ class LunarLanderScene extends Phaser.Scene {
         // Input
         this.cursors = this.input.keyboard.createCursorKeys();
         this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+
+        // Touch controls for mobile
+        this.touchControls = {
+            left: false,
+            right: false,
+            thrust: false
+        };
+
+        if (isMobileDevice()) {
+            this.createTouchControls();
+        }
     }
 
     createStars() {
@@ -361,6 +408,70 @@ class LunarLanderScene extends Phaser.Scene {
         this.emojiText = null; // Reset emoji text on scene create
     }
 
+    createTouchControls() {
+        const buttonSize = 60;
+        const padding = 20;
+        const bottomY = this.height - buttonSize - padding;
+
+        // Left button
+        const leftButton = this.add.circle(padding + buttonSize / 2, bottomY, buttonSize / 2, 0x4444ff, 0.7)
+            .setInteractive()
+            .on('pointerdown', () => { this.touchControls.left = true; leftButton.setFillStyle(0x6666ff, 0.9); })
+            .on('pointerup', () => { this.touchControls.left = false; leftButton.setFillStyle(0x4444ff, 0.7); })
+            .on('pointerout', () => { this.touchControls.left = false; leftButton.setFillStyle(0x4444ff, 0.7); });
+        
+        this.add.text(padding + buttonSize / 2, bottomY, '◀', {
+            fontSize: '32px',
+            fill: '#ffffff',
+            fontFamily: 'monospace'
+        }).setOrigin(0.5);
+
+        // Right button
+        const rightButton = this.add.circle(padding * 2 + buttonSize * 1.5, bottomY, buttonSize / 2, 0x4444ff, 0.7)
+            .setInteractive()
+            .on('pointerdown', () => { this.touchControls.right = true; rightButton.setFillStyle(0x6666ff, 0.9); })
+            .on('pointerup', () => { this.touchControls.right = false; rightButton.setFillStyle(0x4444ff, 0.7); })
+            .on('pointerout', () => { this.touchControls.right = false; rightButton.setFillStyle(0x4444ff, 0.7); });
+        
+        this.add.text(padding * 2 + buttonSize * 1.5, bottomY, '▶', {
+            fontSize: '32px',
+            fill: '#ffffff',
+            fontFamily: 'monospace'
+        }).setOrigin(0.5);
+
+        // Thrust button
+        const thrustButton = this.add.circle(this.width - padding - buttonSize / 2, bottomY, buttonSize / 2, 0xff4444, 0.7)
+            .setInteractive()
+            .on('pointerdown', () => { this.touchControls.thrust = true; thrustButton.setFillStyle(0xff6666, 0.9); })
+            .on('pointerup', () => { this.touchControls.thrust = false; thrustButton.setFillStyle(0xff4444, 0.7); })
+            .on('pointerout', () => { this.touchControls.thrust = false; thrustButton.setFillStyle(0xff4444, 0.7); });
+        
+        this.add.text(this.width - padding - buttonSize / 2, bottomY, '🔥', {
+            fontSize: '32px',
+            fontFamily: 'monospace'
+        }).setOrigin(0.5);
+
+        // Restart button (hidden initially, shown on game over)
+        this.restartButton = this.add.circle(this.width / 2, this.height / 2 + 80, buttonSize / 2, 0x00ff00, 0.8)
+            .setInteractive()
+            .setVisible(false)
+            .on('pointerdown', () => {
+                this.scene.start('RocketSelectionScene');
+            });
+        
+        this.restartButtonText = this.add.text(this.width / 2, this.height / 2 + 80, 'R', {
+            fontSize: '32px',
+            fill: '#ffffff',
+            fontFamily: 'monospace'
+        }).setOrigin(0.5).setVisible(false);
+
+        // Store reference to show/hide restart button
+        this.showRestartButton = () => {
+            this.restartButton.setVisible(true);
+            this.restartButtonText.setVisible(true);
+        };
+    }
+
     drawLander() {
         this.landerGraphics.clear();
 
@@ -380,7 +491,8 @@ class LunarLanderScene extends Phaser.Scene {
             this.emojiText.setRotation(angle - Math.PI / 4);
 
             // Thruster flame for emoji
-            if (this.cursors.up.isDown && this.fuel > 0 && !this.landed && !this.crashed) {
+            const thrustPressed = this.cursors.up.isDown || this.touchControls.thrust;
+            if (thrustPressed && this.fuel > 0 && !this.landed && !this.crashed) {
                 this.landerGraphics.save();
                 this.landerGraphics.translateCanvas(x, y);
                 this.landerGraphics.rotateCanvas(angle);
@@ -446,7 +558,8 @@ class LunarLanderScene extends Phaser.Scene {
         }
 
         // Thruster flame
-        if (this.cursors.up.isDown && this.fuel > 0 && !this.landed && !this.crashed) {
+        const thrustPressed = this.cursors.up.isDown || this.touchControls.thrust;
+        if (thrustPressed && this.fuel > 0 && !this.landed && !this.crashed) {
             this.landerGraphics.fillStyle(0xffaa00, 1);
             const flameHeight = Phaser.Math.Between(15, 25);
             this.landerGraphics.beginPath();
@@ -465,19 +578,27 @@ class LunarLanderScene extends Phaser.Scene {
             if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
                 this.scene.start('RocketSelectionScene');
             }
+            // Show restart button on mobile
+            if (isMobileDevice() && this.showRestartButton) {
+                this.showRestartButton();
+            }
             return;
         }
 
-        // Handle input
-        if (this.cursors.left.isDown) {
+        // Handle input (keyboard or touch)
+        const leftPressed = this.cursors.left.isDown || this.touchControls.left;
+        const rightPressed = this.cursors.right.isDown || this.touchControls.right;
+        const thrustPressed = this.cursors.up.isDown || this.touchControls.thrust;
+
+        if (leftPressed) {
             this.lander.angle -= this.ROTATION_SPEED;
         }
-        if (this.cursors.right.isDown) {
+        if (rightPressed) {
             this.lander.angle += this.ROTATION_SPEED;
         }
 
         // Thrust
-        if (this.cursors.up.isDown && this.fuel > 0) {
+        if (thrustPressed && this.fuel > 0) {
             this.fuel -= this.FUEL_CONSUMPTION;
             this.lander.vx += Math.sin(this.lander.angle) * this.THRUST;
             this.lander.vy -= Math.cos(this.lander.angle) * this.THRUST;
@@ -586,21 +707,26 @@ class LunarLanderScene extends Phaser.Scene {
         const speed = Math.sqrt(this.lander.vx ** 2 + this.lander.vy ** 2);
         const altitude = Math.max(0, this.getTerrainHeightAt(this.lander.x) - this.lander.y - 15);
         
+        const controlsText = isMobileDevice() 
+            ? 'Controls: Touch buttons' 
+            : 'Controls: ← → Rotate, ↑ Thrust';
+        
         this.uiText.setText([
             `Fuel: ${Math.max(0, this.fuel).toFixed(0)}`,
             `Altitude: ${altitude.toFixed(0)}`,
             `Speed: ${speed.toFixed(2)}`,
             `Angle: ${(this.lander.angle * 180 / Math.PI).toFixed(0)}°`,
-            'Controls: ← → Rotate, ↑ Thrust',
+            controlsText,
             'R: Restart'
         ].join('\n'));
     }
 }
 
+const dimensions = getGameDimensions();
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: dimensions.width,
+    height: dimensions.height,
     parent: 'game-container',
     backgroundColor: '#000000',
     scene: [RocketSelectionScene, GravitySelectionScene, LunarLanderScene],
@@ -610,6 +736,10 @@ const config = {
             gravity: { y: 0 },
             debug: false
         }
+    },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     }
 };
 

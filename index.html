@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Lunar Lander</title>
     <style>
         body {
@@ -14,9 +16,18 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         #game-container {
             border: 2px solid #333;
+        }
+        @media (max-width: 800px) {
+            #game-container {
+                border: none;
+            }
         }
     </style>
 </head>
