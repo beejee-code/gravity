@@ -235,7 +235,7 @@ class LunarLanderScene extends Phaser.Scene {
         // Physics constants (use selected gravity)
         this.GRAVITY = selectedGravity;
         this.THRUST = 0.05;
-        this.ROTATION_SPEED = 0.05;
+        this.ROTATION_SPEED = 0.03;
         this.FUEL_CONSUMPTION = 0.5;
         this.MAX_LANDING_SPEED = 1.5;
         this.MAX_LANDING_ANGLE = 0.2;
