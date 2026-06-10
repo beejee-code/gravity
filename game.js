@@ -45,9 +45,9 @@ class RocketSelectionScene extends Phaser.Scene {
         // Rocket options - adjust layout for mobile
         const rocketOptions = isMobileDevice() 
             ? [
-                { type: 'apple', name: 'Apple Rocket', x: this.width / 2, y: 150 },
-                { type: 'emoji', name: 'Emoji Rocket', x: this.width / 2, y: 300 },
-                { type: 'classic', name: 'Classic Rocket', x: this.width / 2, y: 450 }
+                { type: 'apple', name: 'Apple Rocket', x: this.width / 2, y: 120 },
+                { type: 'emoji', name: 'Emoji Rocket', x: this.width / 2, y: 260 },
+                { type: 'classic', name: 'Classic Rocket', x: this.width / 2, y: 400 }
               ]
             : [
                 { type: 'apple', name: 'Apple Rocket', x: this.width / 2 - 200, y: 200 },
@@ -60,14 +60,17 @@ class RocketSelectionScene extends Phaser.Scene {
             this.drawRocketPreview(option.x, option.y, option.type);
 
             // Name label
-            this.add.text(option.x, option.y + 80, option.name, {
-                fontSize: '20px',
+            const nameFontSize = isMobileDevice() ? '16px' : '20px';
+            const labelOffset = isMobileDevice() ? 50 : 80;
+            this.add.text(option.x, option.y + labelOffset, option.name, {
+                fontSize: nameFontSize,
                 fill: '#ffffff',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Selection button
-            const button = this.add.rectangle(option.x, option.y + 150, 150, 50, 0x4444ff)
+            const buttonOffset = isMobileDevice() ? 90 : 150;
+            const button = this.add.rectangle(option.x, option.y + buttonOffset, 120, 40, 0x4444ff)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerover', () => button.setFillStyle(0x6666ff))
                 .on('pointerout', () => button.setFillStyle(0x4444ff))
@@ -76,8 +79,9 @@ class RocketSelectionScene extends Phaser.Scene {
                     this.scene.start('GravitySelectionScene');
                 });
 
-            this.add.text(option.x, option.y + 150, 'SELECT', {
-                fontSize: '18px',
+            const buttonTextFontSize = isMobileDevice() ? '14px' : '18px';
+            this.add.text(option.x, option.y + buttonOffset, 'SELECT', {
+                fontSize: buttonTextFontSize,
                 fill: '#ffffff',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
@@ -185,9 +189,9 @@ class GravitySelectionScene extends Phaser.Scene {
         // Gravity options - adjust layout for mobile
         const gravityOptions = isMobileDevice()
             ? [
-                { type: 'moon', name: 'Moon Gravity', value: 0.0033, description: '~1/6 Earth gravity', x: this.width / 2, y: 150 },
-                { type: 'earth', name: 'Earth Gravity', value: 0.02, description: 'Standard gravity', x: this.width / 2, y: 300 },
-                { type: 'asteroid', name: 'Asteroid Gravity', value: 0.0015, description: '~1/20 Earth gravity', x: this.width / 2, y: 450 }
+                { type: 'moon', name: 'Moon Gravity', value: 0.0033, description: '~1/6 Earth gravity', x: this.width / 2, y: 120 },
+                { type: 'earth', name: 'Earth Gravity', value: 0.02, description: 'Standard gravity', x: this.width / 2, y: 260 },
+                { type: 'asteroid', name: 'Asteroid Gravity', value: 0.0015, description: '~1/20 Earth gravity', x: this.width / 2, y: 400 }
               ]
             : [
                 { type: 'moon', name: 'Moon Gravity', value: 0.0033, description: '~1/6 Earth gravity', x: this.width / 2 - 250, y: 200 },
@@ -197,28 +201,34 @@ class GravitySelectionScene extends Phaser.Scene {
 
         gravityOptions.forEach((option, index) => {
             // Name label
+            const nameFontSize = isMobileDevice() ? '18px' : '24px';
             this.add.text(option.x, option.y, option.name, {
-                fontSize: '24px',
+                fontSize: nameFontSize,
                 fill: '#ffffff',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Description
-            this.add.text(option.x, option.y + 40, option.description, {
-                fontSize: '16px',
+            const descFontSize = isMobileDevice() ? '12px' : '16px';
+            const descOffset = isMobileDevice() ? 25 : 40;
+            this.add.text(option.x, option.y + descOffset, option.description, {
+                fontSize: descFontSize,
                 fill: '#aaaaaa',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Gravity value
-            this.add.text(option.x, option.y + 70, `G: ${option.value}`, {
-                fontSize: '14px',
+            const valueFontSize = isMobileDevice() ? '11px' : '14px';
+            const valueOffset = isMobileDevice() ? 45 : 70;
+            this.add.text(option.x, option.y + valueOffset, `G: ${option.value}`, {
+                fontSize: valueFontSize,
                 fill: '#888888',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
 
             // Selection button
-            const button = this.add.rectangle(option.x, option.y + 150, 150, 50, 0x4444ff)
+            const buttonOffset = isMobileDevice() ? 85 : 150;
+            const button = this.add.rectangle(option.x, option.y + buttonOffset, 120, 40, 0x4444ff)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerover', () => button.setFillStyle(0x6666ff))
                 .on('pointerout', () => button.setFillStyle(0x4444ff))
@@ -227,8 +237,9 @@ class GravitySelectionScene extends Phaser.Scene {
                     this.scene.start('LunarLanderScene');
                 });
 
-            this.add.text(option.x, option.y + 150, 'SELECT', {
-                fontSize: '18px',
+            const buttonTextFontSize = isMobileDevice() ? '14px' : '18px';
+            this.add.text(option.x, option.y + buttonOffset, 'SELECT', {
+                fontSize: buttonTextFontSize,
                 fill: '#ffffff',
                 fontFamily: 'monospace'
             }).setOrigin(0.5);
@@ -316,6 +327,11 @@ class LunarLanderScene extends Phaser.Scene {
             left: false,
             right: false,
             thrust: false
+        };
+        this.touchPointers = {
+            left: null,
+            right: null,
+            thrust: null
         };
 
         if (isMobileDevice()) {
@@ -416,9 +432,25 @@ class LunarLanderScene extends Phaser.Scene {
         // Left button
         const leftButton = this.add.circle(padding + buttonSize / 2, bottomY, buttonSize / 2, 0x4444ff, 0.7)
             .setInteractive()
-            .on('pointerdown', () => { this.touchControls.left = true; leftButton.setFillStyle(0x6666ff, 0.9); })
-            .on('pointerup', () => { this.touchControls.left = false; leftButton.setFillStyle(0x4444ff, 0.7); })
-            .on('pointerout', () => { this.touchControls.left = false; leftButton.setFillStyle(0x4444ff, 0.7); });
+            .on('pointerdown', (pointer) => { 
+                this.touchPointers.left = pointer.id; 
+                this.touchControls.left = true; 
+                leftButton.setFillStyle(0x6666ff, 0.9); 
+            })
+            .on('pointerup', (pointer) => { 
+                if (this.touchPointers.left === pointer.id) {
+                    this.touchControls.left = false; 
+                    this.touchPointers.left = null;
+                    leftButton.setFillStyle(0x4444ff, 0.7); 
+                }
+            })
+            .on('pointerout', (pointer) => { 
+                if (this.touchPointers.left === pointer.id) {
+                    this.touchControls.left = false; 
+                    this.touchPointers.left = null;
+                    leftButton.setFillStyle(0x4444ff, 0.7); 
+                }
+            });
         
         this.add.text(padding + buttonSize / 2, bottomY, '◀', {
             fontSize: '32px',
@@ -429,9 +461,25 @@ class LunarLanderScene extends Phaser.Scene {
         // Right button
         const rightButton = this.add.circle(padding * 2 + buttonSize * 1.5, bottomY, buttonSize / 2, 0x4444ff, 0.7)
             .setInteractive()
-            .on('pointerdown', () => { this.touchControls.right = true; rightButton.setFillStyle(0x6666ff, 0.9); })
-            .on('pointerup', () => { this.touchControls.right = false; rightButton.setFillStyle(0x4444ff, 0.7); })
-            .on('pointerout', () => { this.touchControls.right = false; rightButton.setFillStyle(0x4444ff, 0.7); });
+            .on('pointerdown', (pointer) => { 
+                this.touchPointers.right = pointer.id; 
+                this.touchControls.right = true; 
+                rightButton.setFillStyle(0x6666ff, 0.9); 
+            })
+            .on('pointerup', (pointer) => { 
+                if (this.touchPointers.right === pointer.id) {
+                    this.touchControls.right = false; 
+                    this.touchPointers.right = null;
+                    rightButton.setFillStyle(0x4444ff, 0.7); 
+                }
+            })
+            .on('pointerout', (pointer) => { 
+                if (this.touchPointers.right === pointer.id) {
+                    this.touchControls.right = false; 
+                    this.touchPointers.right = null;
+                    rightButton.setFillStyle(0x4444ff, 0.7); 
+                }
+            });
         
         this.add.text(padding * 2 + buttonSize * 1.5, bottomY, '▶', {
             fontSize: '32px',
@@ -442,9 +490,25 @@ class LunarLanderScene extends Phaser.Scene {
         // Thrust button
         const thrustButton = this.add.circle(this.width - padding - buttonSize / 2, bottomY, buttonSize / 2, 0xff4444, 0.7)
             .setInteractive()
-            .on('pointerdown', () => { this.touchControls.thrust = true; thrustButton.setFillStyle(0xff6666, 0.9); })
-            .on('pointerup', () => { this.touchControls.thrust = false; thrustButton.setFillStyle(0xff4444, 0.7); })
-            .on('pointerout', () => { this.touchControls.thrust = false; thrustButton.setFillStyle(0xff4444, 0.7); });
+            .on('pointerdown', (pointer) => { 
+                this.touchPointers.thrust = pointer.id; 
+                this.touchControls.thrust = true; 
+                thrustButton.setFillStyle(0xff6666, 0.9); 
+            })
+            .on('pointerup', (pointer) => { 
+                if (this.touchPointers.thrust === pointer.id) {
+                    this.touchControls.thrust = false; 
+                    this.touchPointers.thrust = null;
+                    thrustButton.setFillStyle(0xff4444, 0.7); 
+                }
+            })
+            .on('pointerout', (pointer) => { 
+                if (this.touchPointers.thrust === pointer.id) {
+                    this.touchControls.thrust = false; 
+                    this.touchPointers.thrust = null;
+                    thrustButton.setFillStyle(0xff4444, 0.7); 
+                }
+            });
         
         this.add.text(this.width - padding - buttonSize / 2, bottomY, '🔥', {
             fontSize: '32px',
