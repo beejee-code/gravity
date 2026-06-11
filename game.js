@@ -571,11 +571,19 @@ class LunarLanderScene extends Phaser.Scene {
                             this.rightButton.setVisible(false);
                         } else {
                             this.gyroscopeEnabled = false;
-                            alert('Permission denied for device orientation');
+                            this.gyroButton.setFillStyle(0x00aa00, 0.7);
+                            this.gyroButtonText.setText('🔄');
+                            alert('Permission denied for device orientation. Please enable it in Settings.');
                         }
                     })
-                    .catch(console.error);
-            } else {
+                    .catch(error => {
+                        console.error('Device orientation permission error:', error);
+                        this.gyroscopeEnabled = false;
+                        this.gyroButton.setFillStyle(0x00aa00, 0.7);
+                        this.gyroButtonText.setText('🔄');
+                        alert('Failed to request device orientation permission. Make sure this is a secure (HTTPS) context or try again.');
+                    });
+            } else if (typeof DeviceOrientationEvent !== 'undefined') {
                 // Non-iOS devices or older iOS
                 window.addEventListener('deviceorientation', this.handleOrientation.bind(this));
                 this.gyroButton.setFillStyle(0x00ff00, 0.9);
@@ -583,6 +591,12 @@ class LunarLanderScene extends Phaser.Scene {
                 // Hide rotation buttons
                 this.leftButton.setVisible(false);
                 this.rightButton.setVisible(false);
+            } else {
+                // Device orientation not supported
+                this.gyroscopeEnabled = false;
+                this.gyroButton.setFillStyle(0x00aa00, 0.7);
+                this.gyroButtonText.setText('🔄');
+                alert('Device orientation is not supported on this device.');
             }
         } else {
             window.removeEventListener('deviceorientation', this.handleOrientation.bind(this));
